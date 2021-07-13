@@ -97,7 +97,6 @@ body {
     width: 100%;
     position: relative;
     top: 5%;
-    background-color: aqua;
     margin-bottom: 120px;
 }
 
@@ -249,4 +248,13 @@ body {
 }
 #sidebarCollapse span:nth-of-type(2) {
     transform: rotate(315deg);
+}
+
+.shared-screen {
+    width: 400px;
+    height: auto;
+}
+.shared-screen.expand{
+    width: 900px;
+    height: auto;
 }

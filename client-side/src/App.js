@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Room from './Room';
 import SimpleRoom from './SimpleRoom';
-import StreamPermissions from './StreamPermissions'
+import StreamPermissions from './StreamPermissions';
+import Chatroom from './Chatroom';
 import Register from './Register';
 import Login from './Login';
 import Session from './Session';
@@ -38,12 +39,16 @@ class App extends Component {
         <Switch>
           <Route path='/sessions' component={Session} />
 
-          <Route path='/:id/:session/:name/:video/:audio' render = {(props) =>
-              <Room {...props}/> }>
+          <Route exact path='/:id/:session/:name' render = {(props) =>
+            <Chatroom {...props}/> }>
           </Route>
 
-          <Route path='/:id/:session' render = {(props) =>
+          <Route exact path='/:id/:session' render = {(props) =>
               <StreamPermissions {...props}/> }>
+          </Route>
+
+          <Route path='/:id/:session/:name/:video/:audio' render = {(props) =>
+              <Room {...props}/> }>
           </Route>
 
           <Route path='/' component={Homepage} />
@@ -57,8 +62,12 @@ class App extends Component {
       routes = (
         <Switch>
 
-          <Route exact path='/:id/:session' render = {(props) =>
-            <StreamPermissions {...props}/> }>
+          <Route exact path='/:id/:session' render = {(props) => 
+              <StreamPermissions {...props}/> }>
+          </Route>
+
+          <Route exact path='/:id/:session/:name' render = {(props) =>
+            <Chatroom {...props}/> }>
           </Route>
 
           <Route path='/:id/:session/:name/:video/:audio' render = {(props) =>

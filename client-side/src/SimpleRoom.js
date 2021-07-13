@@ -1,10 +1,14 @@
-import React, { Component, useCallback } from 'react';
+import React, { Component } from 'react';
 import { io } from 'socket.io-client';
 import Chat from "./Chat";
 import Notebook from "./Notebook";
 import Peer from 'peerjs';
 import 'bootstrap/dist/css/bootstrap.css';
 import "./room.css";
+
+const real = "https://my-meet-app.herokuapp.com/";
+const local = "http://localhost:5000";
+
 
 class SimpleRoom extends Component {
   constructor(props) {
@@ -17,8 +21,10 @@ class SimpleRoom extends Component {
           Streams: [],
           ScreenShared: { "bool": false, "stream": null},
           NewMessage: null,
-          MyNotes: ""
+          MyNotes: [],
+          ChatroomMssgs: []
 		};
+
     this.socket = io("http://localhost:5000");
     this.roomId = this.props.match.params.id;
     this.MyName = this.props.match.params.name;
@@ -32,14 +38,23 @@ class SimpleRoom extends Component {
     const roomId = this.roomId;
     this.socket.on("connect", () => {
       this.setState({ MyId: this.socket.id});
-      console.log('my id', this.state.MyId);
+      this.getChatroomMessages();
       this.setState({MyPeer: new Peer(this.socket.id)});
-      console.log('peer - ',this.state.MyPeer.id);
+      /*this.setState({MyPeer: new Peer(this.socket.id, { host: "meetapp-peerjs-server.herokuapp.com", port: window.location.protocol === 'https:' ? 443 : 9000, secure: true, debug: 3, 
+          config: {'iceServers': [
+              { 'urls': 'stun:stun.l.google.com:19302' },
+              { 'urls': 'turn:numb.viagenie.ca:3478', credential: 'muazkh', username:'webrtc@live.com' },
+              { 'urls': 'turn:numb.viagenie.ca', credential: 'muazkh', username:'webrtc@live.com' },
+              { 'urls': 'turn:192.158.29.39:3478?transport=udp', credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', username:'28224511:1379330808' },
+              { 'urls': 'turn:192.158.29.39:3478?transport=tcp', credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', username:'28224511:1379330808' },
+              { 'urls': "turn:13.250.13.83:3478?transport=udp","username": "YzYNCouZM1mhqhmseWk6","credential": "YzYNCouZM1mhqhmseWk6"}
+            ]
+          }})});*/
       this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
       this.getAllUsers(roomId);
       this.AcceptConnection();
     });
-
+    
     this.getMyStream();
 
     this.socket.on("all-users", (array) => {
@@ -64,11 +79,18 @@ class SimpleRoom extends Component {
 
     this.socket.on("chat-mssg", (mssg, userName) => {
       this.setState({ NewMessage: { "message": mssg , "userName": userName } });
-      console.log("new mssg", this.state.NewMessage);
-    })
+      //console.log("new mssg", this.state.NewMessage);
+    });
+
+    this.socket.on("all-chatroom-mssg", (array) => {
+      this.setState({ChatroomMssgs: array});
+    });
 
   };
 
+  getChatroomMessages = () => {
+    this.socket.emit("get-chatroom-mssg", this.roomId)
+  };
 
   getMyStream = () => {
     navigator.mediaDevices.getUserMedia({'video':true, 'audio': true})
@@ -92,6 +114,7 @@ class SimpleRoom extends Component {
       };
 
       setInitialStream(this.initialVideo, this.initialAudio);
+      this.AcceptConnection();
     })
     .catch(error => {
       console.error('Error accessing media devices.', error);
@@ -109,31 +132,32 @@ class SimpleRoom extends Component {
   };
 
   MakeConnection = (id) => {
-    console.log("make conn", id);
-    var call = this.state.MyPeer.call(id, this.state.MyStream, {metadata: { "type" : "camera"}});
-    call.on("stream", (stream) => {
-      if (!this.state.Streams.includes(stream.id)) {
-        this.setState({ Streams: [...this.state.Streams, stream.id]})
-        this.addMemberVideo(stream, call.peer);
-        console.log("make conn", id);
-      }
-    })
+    if (this.state.MyPeer!==null){
+      var call = this.state.MyPeer.call(id, this.state.MyStream, {metadata: { "type" : "camera"}});
+      call.on("stream", (stream) => {
+        if (!this.state.Streams.includes(stream.id)) {
+          this.setState({ Streams: [...this.state.Streams, stream.id]})
+          this.addMemberVideo(stream, call.peer);
+          //console.log("added member vid called", id);
+        }
+      })
+    } 
   };
 
   AcceptConnection = () => {
-    this.state.MyPeer.on("call", (call) => {
-    
-      if (call.metadata.type==="camera") {
-        call.answer(this.state.MyStream);
-        call.on("stream", (stream) => {
-          if (!this.state.Streams.includes(stream.id)) {
-            this.setState({ Streams: [...this.state.Streams, stream.id]})
-            this.addMemberVideo(stream, call.peer);
-            console.log("accepted connection");
-            }
-          })
-        } 
-      })    
+    if (this.state.MyPeer!==null) {
+      this.state.MyPeer.on("call", (call) => {  
+        if (call.metadata.type==="camera") {
+          call.answer(this.state.MyStream);
+          call.on("stream", (stream) => {
+            if (!this.state.Streams.includes(stream.id)) {
+              this.setState({ Streams: [...this.state.Streams, stream.id]})
+              this.addMemberVideo(stream, call.peer);
+              }
+            })
+          } 
+        })  
+      } 
     };
 
   addMyVideo = (stream) => {
@@ -170,20 +194,24 @@ class SimpleRoom extends Component {
     container.classList.toggle('expand');
     memberNameDiv.classList.toggle('expand');
     video.classList.toggle('expand');
+  }
 
+  screenShareExpand = (id) => {
+    const vid = document.getElementById(id);
+    vid.classList.toggle('expand');
   }
 
   myVideoControl = (stream) => {
     if(stream!=null){
       stream.getVideoTracks()[0].enabled = !(stream.getVideoTracks()[0].enabled);
-      console.log("stream set", typeof(stream.getVideoTracks()[0]))
+      //console.log("stream set", typeof(stream.getVideoTracks()[0]))
     }
   };
 
   myAudioControl = (stream) => {
     if(stream!=null){
       stream.getAudioTracks()[0].enabled = !(stream.getAudioTracks()[0].enabled);
-      console.log("stream set", stream.getAudioTracks()[0])
+      //console.log("stream set", stream.getAudioTracks()[0])
     }
   };
 
@@ -232,11 +260,13 @@ class SimpleRoom extends Component {
         this.socket.emit("send screen", this.roomId);
         const container = document.getElementById("stream-container");
         const video = document.createElement("video");
-        video.id = "screen" + this.state.MyId;
+        video.className = "shared-screen";
+        const vidId = "screen" + this.state.MyId;
+        video.id = vidId;
+        video.onclick = () => {this.screenShareExpand(vidId)}
         container.appendChild(video);
         video.srcObject = stream;
         video.play();
-        video.setAttribute("width","400");
       }
     }
   };
@@ -244,7 +274,7 @@ class SimpleRoom extends Component {
   acceptScreen = () => {
     if (this.state.MyPeer !== null) {
       this.state.MyPeer.on("call", (call) => {
-        if (call.metadata.type=="screenShare") {
+        if (call.metadata.type==="screenShare") {
           call.answer();
           call.on("stream", (stream => {
           if (!this.state.Streams.includes(stream.id)) {
@@ -270,7 +300,7 @@ class SimpleRoom extends Component {
 
   getNotes = (notes) => {
     const array = notes.split('\n');
-    this.setState({ MyNotes: notes })
+    this.setState({ MyNotes: array })
   }
 
   sidebarToggle = () => {
@@ -293,14 +323,12 @@ class SimpleRoom extends Component {
     const toggle_btn = document.getElementById('streamToggle');
     stream.classList.toggle('streamHide');
     toggle_btn.classList.toggle('collapsed');
-    /**/ 
     const members = document.getElementById('membersContainer');
     const chat_log = document.getElementById('chat_log');
     const notebook = document.getElementById('notes_page');
     members.classList.toggle('expand');
     chat_log.classList.toggle('expand');
     notebook.classList.toggle('expand');
-
   }
   
 
@@ -308,10 +336,7 @@ class SimpleRoom extends Component {
     const roomId = this.roomId;
     const MyName = this.MyName;
     const sessionTitle = this.sessionTitle;
-    const { Users } = this.state;
-    const { MyId } = this.state;
-    const { MyStream } = this.state;
-    const { NewMessage } = this.state;
+    const { ChatroomMssgs, MyId, MyStream, NewMessage, Users } = this.state;
 
     return(
       <>
@@ -351,11 +376,11 @@ class SimpleRoom extends Component {
                 <div class="tab-content" id="pills-tabContent">
                   <div class="tab-pane fade show active" id="pills-participants" role="tabpanel" aria-labelledby="pills-participants-tab"> 
                     <div className="membersContainer" id="membersContainer">
-                      { Users.map(user => <div className='member_name'>{user.userName}<br></br></div>)}
+                      { Users.map((user, index) => <div key={index} className='member_name'>{user.userName}<br></br></div>)}
                     </div>
                   </div>
                   <div class="tab-pane fade" id="pills-chat" role="tabpanel" aria-labelledby="pills-chat-tab">
-                    <Chat author={this.MyName} message={NewMessage} sendMessage={this.sendMessage} />
+                    <Chat author={this.MyName} message={NewMessage} sendMessage={this.sendMessage} ChatroomMssgs={ChatroomMssgs}/>
                   </div>
                   <div class="tab-pane fade" id="pills-notebook" role="tabpanel" aria-labelledby="pills-notebook-tab">
                     <Notebook getNotes={this.getNotes}/>

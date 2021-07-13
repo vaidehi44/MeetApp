@@ -1,4 +1,4 @@
-import React, { Component, useCallback } from 'react';
+import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { io } from 'socket.io-client';
 import Chat from "./Chat";
@@ -17,25 +17,37 @@ class Room extends Component {
           MyPeer:null,
           Streams: [],
           ScreenShared: { "bool": false, "stream": null},
-          NewMessage:null,
-          MyNotes: []
+          NewMessage: null,
+          MyNotes: [],
+          ChatroomMssgs: []
 		};
+
     this.socket = io("http://localhost:5000");
-    this.MyName = localStorage.getItem('meetapp-username');
+    this.MyName = this.props.match.params.name;
     this.roomId = this.props.match.params.id;
     this.MyDbId = localStorage.getItem('meetapp-dbId');
     this.initialVideo = this.props.match.params.video;
     this.initialAudio = this.props.match.params.audio;
     this.sessionTitle = this.props.match.params.session;
+
 	};
 
   componentDidMount() {
     const roomId = this.roomId;
     this.socket.on("connect", () => {
       this.setState({ MyId: this.socket.id});
-      console.log('my id', this.state.MyId);
+      this.getChatroomMessages();
       this.setState({MyPeer: new Peer(this.socket.id)});
-      console.log('peer - ',this.state.MyPeer.id);
+    /*  this.setState({MyPeer: new Peer(this.socket.id, { host: "meetapp-peerjs-server.herokuapp.com", port: window.location.protocol === 'https:' ? 443 : 9000, secure: true, debug: 3, 
+      config: {'iceServers': [
+          { 'urls': 'stun:stun.l.google.com:19302' },
+          { 'urls': 'turn:numb.viagenie.ca:3478', credential: 'muazkh', username:'webrtc@live.com' },
+          { 'urls': 'turn:numb.viagenie.ca', credential: 'muazkh', username:'webrtc@live.com' },
+          { 'urls': 'turn:192.158.29.39:3478?transport=udp', credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', username:'28224511:1379330808' },
+          { 'urls': 'turn:192.158.29.39:3478?transport=tcp', credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', username:'28224511:1379330808' },
+          { 'urls': "turn:13.250.13.83:3478?transport=udp","username": "YzYNCouZM1mhqhmseWk6","credential": "YzYNCouZM1mhqhmseWk6"}
+        ]
+      }})});     */ 
       this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
       this.getAllUsers(roomId);
       this.AcceptConnection();
@@ -45,7 +57,6 @@ class Room extends Component {
 
     this.socket.on("all-users", (array) => {
       this.setState({ Users: array });
-      console.log(array);
     });
 
     this.socket.on("user-connected", (userId) => {
@@ -66,12 +77,18 @@ class Room extends Component {
 
     this.socket.on("chat-mssg", (mssg, userName) => {
       this.setState({ NewMessage: { "message": mssg , "userName": userName } });
-      console.log("new mssg", this.state.NewMessage);
+      //console.log("new mssg", this.state.NewMessage);
     });
 
+    this.socket.on("all-chatroom-mssg", (array) => {
+      this.setState({ChatroomMssgs: array});
+    });
 
   };
 
+  getChatroomMessages = () => {
+    this.socket.emit("get-chatroom-mssg", this.roomId)
+  };
 
   getMyStream = () => {
     navigator.mediaDevices.getUserMedia({'video':true, 'audio': true})
@@ -96,7 +113,7 @@ class Room extends Component {
       };
 
       setInitialStream(this.initialVideo, this.initialAudio);
-    
+      this.AcceptConnection();
     })
     .catch(error => {
       console.error('Error accessing media devices.', error);
@@ -111,37 +128,35 @@ class Room extends Component {
       this.getAllUsers(roomId);
       this.MakeConnection(userId);
       this.AcceptConnection();
-
   };
 
   MakeConnection = (id) => {
-    var call = this.state.MyPeer.call(id, this.state.MyStream, {metadata: { "type" : "camera"}});
-    call.on("stream", (stream) => {
-      if (!this.state.Streams.includes(stream.id)) {
-        this.setState({ Streams: [...this.state.Streams, stream.id]})
-        this.addMemberVideo(stream, call.peer);
-        console.log("make", id)
-      }
-    })
+    if (this.state.MyPeer!==null){
+      var call = this.state.MyPeer.call(id, this.state.MyStream, {metadata: { "type" : "camera"}});
+      call.on("stream", (stream) => {
+        if (!this.state.Streams.includes(stream.id)) {
+          this.setState({ Streams: [...this.state.Streams, stream.id]})
+          this.addMemberVideo(stream, call.peer);
+          //console.log("added member vid called", id);
+        }
+      })
+    } 
   };
 
   AcceptConnection = () => {
-    this.state.MyPeer.on("call", (call) => {
-      console.log("accepting conn 1", call);
-      if (call.metadata.type==="camera") {
-        call.answer(this.state.MyStream);
-        console.log("accepting conn 2", call);
-        call.on("stream", (stream) => {
-          console.log("accepting conn 3", call);
-          if (!this.state.Streams.includes(stream.id)) {
-            console.log("accepting conn 4", call);
-            this.setState({ Streams: [...this.state.Streams, stream.id]})
-            this.addMemberVideo(stream, call.peer);
-            console.log("accepted connection again");
-            }
-          })
-        } 
-      })    
+    if (this.state.MyPeer!==null) {
+      this.state.MyPeer.on("call", (call) => {  
+        if (call.metadata.type==="camera") {
+          call.answer(this.state.MyStream);
+          call.on("stream", (stream) => {
+            if (!this.state.Streams.includes(stream.id)) {
+              this.setState({ Streams: [...this.state.Streams, stream.id]})
+              this.addMemberVideo(stream, call.peer);
+              }
+            })
+          } 
+        })  
+      } 
     };
 
   addMyVideo = (stream) => {
@@ -169,7 +184,6 @@ class Room extends Component {
     video.className = "memberVideo";
     video.srcObject = stream;
     video.play();
-    console.log("video added", video.srcObject);
   };
 
   screenExpand = (id) => {
@@ -179,20 +193,24 @@ class Room extends Component {
     container.classList.toggle('expand');
     memberNameDiv.classList.toggle('expand');
     video.classList.toggle('expand');
+  }
 
+  screenShareExpand = (id) => {
+    const vid = document.getElementById(id);
+    vid.classList.toggle('expand');
   }
 
   myVideoControl = (stream) => {
     if(stream!=null){
       stream.getVideoTracks()[0].enabled = !(stream.getVideoTracks()[0].enabled);
-      console.log("stream set", stream.getVideoTracks()[0])
+      //console.log("stream set", stream.getVideoTracks()[0])
     }
   };
 
   myAudioControl = (stream) => {
     if(stream!=null){
       stream.getAudioTracks()[0].enabled = !(stream.getAudioTracks()[0].enabled);
-      console.log("stream set", stream.getAudioTracks()[0])
+      //console.log("stream set", stream.getAudioTracks()[0])
     }
   };
 
@@ -204,7 +222,6 @@ class Room extends Component {
   }
 
   disconnect = (roomId, userId) => {
-    console.log('clicked');
     this.setState({ showModal: false });
     this.state.MyPeer.destroy();
     this.socket.emit("disconnect-me", roomId, userId);
@@ -249,11 +266,13 @@ class Room extends Component {
         this.socket.emit("send screen", this.roomId);
         const container = document.getElementById("stream-container");
         const video = document.createElement("video");
-        video.id = "screen" + this.state.MyId;
+        video.className = "shared-screen";
+        const vidId = "screen" + this.state.MyId;
+        video.id = vidId;
+        video.onclick = () => {this.screenShareExpand(vidId)}
         container.appendChild(video);
         video.srcObject = stream;
         video.play();
-        video.setAttribute("width","400");
       }
     }
   };
@@ -261,7 +280,7 @@ class Room extends Component {
   acceptScreen = () => {
     if (this.state.MyPeer !== null) {
       this.state.MyPeer.on("call", (call) => {
-        if (call.metadata.type=="screenShare") {
+        if (call.metadata.type==="screenShare") {
           call.answer();
           call.on("stream", (stream => {
           if (!this.state.Streams.includes(stream.id)) {
@@ -310,14 +329,12 @@ class Room extends Component {
     const toggle_btn = document.getElementById('streamToggle');
     stream.classList.toggle('streamHide');
     toggle_btn.classList.toggle('collapsed');
-    /**/ 
     const members = document.getElementById('membersContainer');
     const chat_log = document.getElementById('chat_log');
     const notebook = document.getElementById('notes_page');
     members.classList.toggle('expand');
     chat_log.classList.toggle('expand');
     notebook.classList.toggle('expand');
-
   }
   
 
@@ -326,14 +343,9 @@ class Room extends Component {
     const MyDbId = this.MyDbId;
     const MyName = this.MyName;
     const sessionTitle = this.sessionTitle;
-    const { Users } = this.state;
-    const { MyId } = this.state;
-    const { MyStream } = this.state;
-    const { NewMessage } = this.state;
-    const { MyNotes } = this.state;
+    const { Users, MyId, MyStream, NewMessage, MyNotes, ChatroomMssgs } = this.state;
 
     return(
-
       <>
       <div className="room_page d-inline-flex" >
           <div id="sidebar" className='d-flex flex-column align-items-center justify-content-start'>
@@ -375,7 +387,7 @@ class Room extends Component {
                     </div>
                   </div>
                   <div class="tab-pane fade" id="pills-chat" role="tabpanel" aria-labelledby="pills-chat-tab">
-                    <Chat author={this.MyName} message={NewMessage} sendMessage={this.sendMessage} />
+                    <Chat author={this.MyName} message={NewMessage} sendMessage={this.sendMessage} ChatroomMssgs={ChatroomMssgs}/>
                   </div>
                   <div class="tab-pane fade" id="pills-notebook" role="tabpanel" aria-labelledby="pills-notebook-tab">
                     <Notebook getNotes={this.getNotes}/>
