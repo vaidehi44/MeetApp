@@ -90,7 +90,7 @@ class SimpleHomepage extends Component {
                             <h4>{name},</h4>
                             <h5>
                                 Your link is - <br></br>
-                                <input id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
+                                <input id="copy_text" value={"https://my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
 
                             </h5>                        
                             </div>                   

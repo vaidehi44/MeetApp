@@ -104,7 +104,7 @@ class Homepage extends Component {
                             <h4>{name},</h4>
                             <h6>
                                 Your link is - <br></br>
-                                <input id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
+                                <input id="copy_text" value={"https://my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
 
                             </h6>
                         </div>

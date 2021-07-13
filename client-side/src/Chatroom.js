@@ -216,7 +216,7 @@ class ChatRoom extends Component {
                         <div>
                             <h5>{name},</h5>
                         </div>
-                        <input id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
+                        <input id="copy_text" value={"https://my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
                         <div>Please allow browser to access your video and audio streams and select your initial video and audio preferences -</div>
                         <label className="switch">
                             <input type="checkbox" onChange = { this.handleVideo }></input>
