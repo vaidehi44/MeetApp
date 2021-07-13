@@ -22,8 +22,8 @@
     padding: 10px;
     padding-top:6px;
     margin: 8px;
-    min-width: 100px;
-    max-width: 250px;;
+    width: fit-content;
+    max-width: 250px;
     overflow-wrap: break-word;
 }
 
