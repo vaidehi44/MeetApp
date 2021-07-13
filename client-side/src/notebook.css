@@ -5,9 +5,18 @@
     background-color: rgb(231, 246, 247);
     white-space: pre-wrap;
     white-space: pre-line;
+    border-radius: 4px;
     transition: height 0.7s;
 }
 
 .notes_page.expand{
     height: 80vh;
+}
+
+textarea.notes_page {
+    width: 300px;
+    height: 400px;
+    padding: 0 0 0 20px;
+    line-height: 30px;
+    background: #fff url("http://i.stack.imgur.com/UfzKa.jpg") no-repeat -75px -135px
 }

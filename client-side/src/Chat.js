@@ -95,14 +95,14 @@ class Chat extends Component {
         return(
 
             <>
-                <div className='chat_form'>
+                <div className='chat_form d-flex flex-column justify-content-center'>
 
                     <div className="chat_log" id="chat_log">
                         <ul className="list-group" id="chat-log">
                         </ul>
                     </div>
 
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <form onSubmit={this.handleSubmit} autoComplete="off" className="input_form">
                         <input type="text" 
                             class="form-control" 
                             name="mssg_input" 

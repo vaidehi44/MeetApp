@@ -36,6 +36,11 @@ class SimpleHomepage extends Component {
     setName = (e) => {
         this.setState({ name: e.target.value });
     }
+    copy_link = (e) => {
+        const copy_text = document.getElementById("copy_text");
+        copy_text.select();
+        document.execCommand("copy");
+    }
 
     render() {
         const roomId = uuidv4();
@@ -44,12 +49,17 @@ class SimpleHomepage extends Component {
             <>
                 <Navbar />
                 <div className="website-content">
-                    <h1>MeetApp</h1>
-                    <h4>Some text..</h4>
+                    <div class="jumbotron">
+                        <h1 class="display-4">MeetApp</h1>
+                        <p class="lead">A text and video chatting/calling webapp based on WebRTC. It has been built using React(frontend), ExpressJS(backend) and MongoDB(database).</p>
+                        <hr class="my-4"></hr>
+                        <p>Create a room for chatting and video calling and get a link to share it with anyone!</p>
 
-                    <button type='button' onClick={this.showModalOne}>
-                        Create New Room
-                    </button>
+                        <button type='button' className="btn btn-primary lg" onClick={this.showModalOne}>
+                            Create New Room
+                        </button>
+
+                    </div>
                 </div>
                 
                 
@@ -60,8 +70,8 @@ class SimpleHomepage extends Component {
                     <Modal.Body>
                         <h4>Hello User</h4>,
                         <h5>Please enter the following details to create a new chatroom</h5>
-                        <h4>Join as - <input type='text' placeholder="Your name" value={name} onChange={this.setName} autoComplete="off"></input></h4>
-                        <h4>Session Title - <input type="text" id="session-title-input" value={sessionTitle} onChange={ this.setTitle } placeholder="(optional)" autoComplete="off"></input></h4>
+                        <h5>Join as - <input type='text' placeholder="Your name" value={name} onChange={this.setName} autoComplete="off"></input></h5>
+                        <h5>Session Title - <input type="text" id="session-title-input" value={sessionTitle} onChange={ this.setTitle } placeholder="(optional)" autoComplete="off"></input></h5>
                         
                     </Modal.Body>
                     <Modal.Footer>
@@ -78,13 +88,18 @@ class SimpleHomepage extends Component {
                     <Modal.Body>
                         <div>
                             <h4>{name},</h4>
-                            <h5>Your link is - <span>meetapp.netlify/{roomId}/{sessionTitle}</span></h5>
-                        </div>                   
+                            <h5>
+                                Your link is - <br></br>
+                                <strong style={{color: '#3965bd'}}>my-meetapp.netlify.app/{roomId}/{sessionTitle}</strong>
+                                <textarea id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle}></textarea>
+
+                            </h5>                        
+                            </div>                   
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button>Copy Link</Button>
+                        <Button onClick={() => this.copy_link}>Copy Link</Button>
                         <Button>
-                            <Link to={"/"+roomId+"/"+sessionTitle+"/"+name}>Enter the Room</Link>
+                            <Link to={"/"+roomId+"/"+sessionTitle+"/"+name} className="button-link">Enter the Room</Link>
                         </Button>
                        
                     </Modal.Footer>

@@ -161,6 +161,12 @@ class ChatRoom extends Component {
         return window.location.href = "/"
       };
 
+    copy_link = (e) => {
+        const copy_text = document.getElementById("copy_text");
+        copy_text.select();
+        document.execCommand("copy");
+    }
+
     render() {
         const { Users, MyId, videoStream, audioStream } = this.state;
         const name = this.MyName;
@@ -210,6 +216,7 @@ class ChatRoom extends Component {
                         <div>
                             <h5>{name},</h5>
                         </div>
+                        <textarea id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle}></textarea>
                         <div>Please allow browser to access your video and audio streams and select your initial video and audio preferences -</div>
                         <label className="switch">
                             <input type="checkbox" onChange = { this.handleVideo }></input>
@@ -223,9 +230,9 @@ class ChatRoom extends Component {
                         </label>                      
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button>Copy Link</Button>
+                        <Button onClick={() => this.copy_link}>Copy Link</Button>
                         <Button>
-                            <Link to={"/"+roomId+"/"+sessionTitle+"/"+name+"/"+videoStream.toString()+"/"+audioStream.toString()}>Enter the Room</Link>
+                            <Link to={"/"+roomId+"/"+sessionTitle+"/"+name+"/"+videoStream.toString()+"/"+audioStream.toString()} id="copy-btn" className="button-link">Enter the Room</Link>
                         </Button>
                        
                     </Modal.Footer>

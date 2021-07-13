@@ -1,3 +1,5 @@
+
+
 .website-content {
   padding: 50px;
 }
@@ -63,4 +65,19 @@
   
   .homepage_modal .slider.round:before {
     border-radius: 50%;
+  }
+
+  .button-link {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .button-link:hover {
+    color: white;
+    text-decoration: none;
+  }
+
+  textarea#copy_text {
+    width: 0px;
+    height: 0px;
   }

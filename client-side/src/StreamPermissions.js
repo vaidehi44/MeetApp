@@ -55,10 +55,10 @@ class StreamPermissions extends Component {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button>
-                            <Link to={"/"}>Cancel</Link>
+                            <Link to={"/"} className="button-link">Cancel</Link>
                         </Button>
                         <Button>
-                            <Link to={"/"+roomId+"/"+session+"/"+loggedInUser}>Enter Room</Link>
+                            <Link to={"/"+roomId+"/"+session+"/"+loggedInUser} className="button-link">Enter Room</Link>
                         </Button>
                     </Modal.Footer>
                 </Modal>
@@ -74,10 +74,10 @@ class StreamPermissions extends Component {
                     </Modal.Body>
                     <Modal.Footer>
                         <Button>
-                            <Link to={"/"}>Cancel</Link>
+                            <Link to={"/"} className="button-link">Cancel</Link>
                         </Button>
                         <Button>
-                            <Link to={"/"+roomId+"/"+session+"/"+name+"/"}>Enter Room</Link>
+                            <Link to={"/"+roomId+"/"+session+"/"+name+"/"} className="button-link">Enter Room</Link>
                         </Button>
                     </Modal.Footer>
                 </Modal>

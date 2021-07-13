@@ -68,7 +68,7 @@ export default class Login extends Component {
 
                     <form className="auth-form" onSubmit={this.handleSubmit} autoComplete="off">
                         <input type="text" name="username" value= {username} placeholder="Username" onChange={this.handleChange}></input>
-                        <input type="text" name="password" value= {password} placeholder="Password" onChange={this.handleChange}></input>
+                        <input type="password" name="password" value= {password} placeholder="Password" onChange={this.handleChange}></input>
                         <input type="submit" value="Login"></input>
                     </form>
                 </div>

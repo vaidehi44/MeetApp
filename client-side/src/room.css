@@ -46,10 +46,11 @@ body {
 
 .membersContainer {
     height: 48vh;
-    background-color: rgb(230, 229, 238);
+    background-color: rgb(193, 209, 216);
     padding: 10px;
     overflow-y: auto;
     transition: height 0.7s;
+    border-radius: 5px;
 
 }
 .membersContainer.expand {

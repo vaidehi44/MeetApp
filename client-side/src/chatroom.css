@@ -7,7 +7,7 @@
 }
 .chatroom_wrapper .members_list{
     width: 25%;
-    background-color: antiquewhite;
+    background-color: rgb(193, 209, 216);
     height: 70vh;
     border-radius: 6px;
     padding: 25px;
@@ -23,7 +23,7 @@
 .chatroom_wrapper .chat_log {
     height: 60vh;
     width: 100%;
-    background-color: bisque;
+    background-color: rgb(193, 209, 216);
     padding: 18px;
     border-radius: 6px 6px 0px 0px;
     overflow-y: auto;
@@ -53,7 +53,7 @@
 
 .chatroom_chat_form .chat_log .chat-mssg-item {
     list-style-type: none;
-    background-color: rgb(183, 199, 202);
+    background-color: rgb(88, 141, 141);
     border-radius: 5px;
     padding: 10px;
     padding-top:6px;
