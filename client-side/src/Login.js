@@ -3,7 +3,7 @@ import "./auth.css";
 import Navbar from './Navbar';
 
 
-const apiUrl = "http://localhost:5000/api/login";
+const apiUrl = "https://my-meetapp-webrtc.herokuapp.com/api/login";
 
 export default class Login extends Component {
 
