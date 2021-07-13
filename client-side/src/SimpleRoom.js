@@ -6,9 +6,6 @@ import Peer from 'peerjs';
 import 'bootstrap/dist/css/bootstrap.css';
 import "./room.css";
 
-const real = "https://my-meet-app.herokuapp.com/";
-const local = "http://localhost:5000";
-
 
 class SimpleRoom extends Component {
   constructor(props) {
@@ -25,7 +22,7 @@ class SimpleRoom extends Component {
           ChatroomMssgs: []
 		};
 
-    this.socket = io("http://localhost:5000");
+    this.socket = io("https://my-meetapp-webrtc.herokuapp.com/");
     this.roomId = this.props.match.params.id;
     this.MyName = this.props.match.params.name;
     this.initialVideo = this.props.match.params.video;
@@ -39,8 +36,8 @@ class SimpleRoom extends Component {
     this.socket.on("connect", () => {
       this.setState({ MyId: this.socket.id});
       this.getChatroomMessages();
-      this.setState({MyPeer: new Peer(this.socket.id)});
-      /*this.setState({MyPeer: new Peer(this.socket.id, { host: "meetapp-peerjs-server.herokuapp.com", port: window.location.protocol === 'https:' ? 443 : 9000, secure: true, debug: 3, 
+     /* this.setState({MyPeer: new Peer(this.socket.id)});*/
+      this.setState({MyPeer: new Peer(this.socket.id, { host: "meetapp-peerjs-server.herokuapp.com", port: window.location.protocol === 'https:' ? 443 : 9000, secure: true, debug: 3, 
           config: {'iceServers': [
               { 'urls': 'stun:stun.l.google.com:19302' },
               { 'urls': 'turn:numb.viagenie.ca:3478', credential: 'muazkh', username:'webrtc@live.com' },
@@ -49,7 +46,7 @@ class SimpleRoom extends Component {
               { 'urls': 'turn:192.158.29.39:3478?transport=tcp', credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', username:'28224511:1379330808' },
               { 'urls': "turn:13.250.13.83:3478?transport=udp","username": "YzYNCouZM1mhqhmseWk6","credential": "YzYNCouZM1mhqhmseWk6"}
             ]
-          }})});*/
+          }})});
       this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
       this.getAllUsers(roomId);
       this.AcceptConnection();

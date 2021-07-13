@@ -22,7 +22,7 @@ class ChatRoom extends Component {
           ChatroomMssgs: []
 		};
 
-        this.socket = io("http://localhost:5000");
+        this.socket = io("https://my-meetapp-webrtc.herokuapp.com/");
         this.roomId = this.props.match.params.id;
         this.sessionTitle = this.props.match.params.session;
         this.MyName = this.props.match.params.name;        
