@@ -40,8 +40,8 @@ class Homepage extends Component {
     setTitle = (e) => {
         this.setState({ sessionTitle: e.target.value });
     }
-    copy_link = () => {
-        const copy_text = document.getElementById("copy_text");
+    copy_link = (e) => {
+        var copy_text = document.getElementById("copy_text");
         copy_text.select();
         document.execCommand("copy");
     }
@@ -104,8 +104,7 @@ class Homepage extends Component {
                             <h4>{name},</h4>
                             <h6>
                                 Your link is - <br></br>
-                                <strong style={{color: '#3965bd'}}>my-meetapp.netlify.app/{roomId}/{sessionTitle}</strong>
-                                <textarea id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle}></textarea>
+                                <input id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
 
                             </h6>
                         </div>

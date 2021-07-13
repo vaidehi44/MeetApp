@@ -77,7 +77,10 @@
     text-decoration: none;
   }
 
-  textarea#copy_text {
-    width: 0px;
-    height: 0px;
+
+  input#copy_text{
+    border: none;
+    border-bottom: 1px solid rgb(54, 90, 168);
+    color: rgb(54, 90, 168);
+    width: 200px;
   }

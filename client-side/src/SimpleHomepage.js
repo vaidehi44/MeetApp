@@ -90,14 +90,13 @@ class SimpleHomepage extends Component {
                             <h4>{name},</h4>
                             <h5>
                                 Your link is - <br></br>
-                                <strong style={{color: '#3965bd'}}>my-meetapp.netlify.app/{roomId}/{sessionTitle}</strong>
-                                <textarea id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle}></textarea>
+                                <input id="copy_text" value={"my-meetapp-webrtc.netlify.app/"+roomId+"/"+sessionTitle} ></input>
 
                             </h5>                        
                             </div>                   
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={() => this.copy_link}>Copy Link</Button>
+                        <Button onClick={this.copy_link}>Copy Link</Button>
                         <Button>
                             <Link to={"/"+roomId+"/"+sessionTitle+"/"+name} className="button-link">Enter the Room</Link>
                         </Button>
