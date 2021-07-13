@@ -3,7 +3,7 @@ import Navbar from './Navbar';
 import './session.css'
 import 'bootstrap/dist/css/bootstrap.css';
 
-const apiUrl = "http://localhost:5000/api/sessions-info";
+const apiUrl = "https://my-meetapp-webrtc.herokuapp.com/api/sessions-info";
 
 
 const showChats = (array) => {
