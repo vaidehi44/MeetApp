@@ -49,7 +49,6 @@ class SimpleRoom extends Component {
           }})});
       this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
       this.getAllUsers(roomId);
-      this.AcceptConnection();
     });
     
     this.getMyStream();
@@ -125,7 +124,6 @@ class SimpleRoom extends Component {
   HandleNewConn = (roomId, userId) => {
       this.getAllUsers(roomId);
       this.MakeConnection(userId);
-      this.AcceptConnection();
   };
 
   MakeConnection = (id) => {

@@ -31,15 +31,15 @@ class Navbar extends Component {
                         </button>
                         <div class="collapse navbar-collapse" id="navbarNavAltMarkup" >
                             <div class="navbar-nav ml-auto mt-2 mt-lg-0" style={{ fontSize: '20px' }}>
-                                <a class="nav-item nav-link" href="#" onClick={this.logout}>Logout</a>
+                                <a class="nav-item nav-link" href="/" onClick={this.logout}>Logout</a>
                             </div>
                         </div>
                     </nav>
                 </>
             ) : (
                 <>
-                    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                        <a class="navbar-brand" href="#" style={{ fontSize: '30px' }}>MeetApp</a>
+                    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                        <a class="navbar-brand" href="/" style={{ fontSize: '30px' }}>MeetApp</a>
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
