@@ -1,4 +1,6 @@
 # MeetApp
+<img src="client-side/public/meetapp-homepage-ss.png" >
+
 ## About The Project
 As a part of **Microsoft Engage Mentorship Program 2021**, I have built a chatting and video calling  webapp using the WebRTC technology. 
 My client-side consists of ReactJS, server-side is made with NodeJS along with sockets.io for socket connections and peerjs for RTCPeerConnections. I have used MongoDB as my database.
