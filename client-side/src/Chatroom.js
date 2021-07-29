@@ -33,7 +33,6 @@ class ChatRoom extends Component {
         const roomId = this.roomId;
         this.socket.on("connect", () => {
           this.setState({ MyId: this.socket.id});
-          console.log('my id', this.state.MyId);
           this.getChatroomMessages();
           this.socket.emit("join-chat-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
           this.getAllUsers(roomId);
@@ -61,7 +60,6 @@ class ChatRoom extends Component {
                 this.setState({ChatroomMssgs: array});
                 //console.log("works", this.state.ChatroomMssgs);
             }
-            
         });
 
     }

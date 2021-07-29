@@ -28,16 +28,24 @@ class SimpleRoom extends Component {
     this.initialVideo = this.props.match.params.video;
     this.initialAudio = this.props.match.params.audio;
     this.sessionTitle = this.props.match.params.session;
-
 	};
 
   componentDidMount() {
     const roomId = this.roomId;
     this.socket.on("connect", () => {
-      this.setState({ MyId: this.socket.id});
-      this.getChatroomMessages();
-     /* this.setState({MyPeer: new Peer(this.socket.id)});*/
-      this.setState({MyPeer: new Peer(this.socket.id, { host: "meetapp-peerjs-server.herokuapp.com", port: window.location.protocol === 'https:' ? 443 : 9000, secure: true, debug: 3, 
+      console.log("socket id - ", this.socket.id);
+      if (this.socket.id.startsWith("_") || this.socket.id.startsWith("-") || this.socket.id.endsWith("_") || this.socket.id.endsWith("-") || 
+          this.socket.id.includes("--") || this.socket.id.includes("-_") || this.socket.id.includes("_-") || this.socket.id.includes("__")) {
+          console.log("Got invalid id from socket, reconnecting again")
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000)
+      } else {
+          console.log("Connected with valid socket id");
+          this.setState({ MyId: this.socket.id });
+          this.getChatroomMessages();
+          /*this.setState({MyPeer: new Peer(this.socket.id)});*/
+          this.setState({MyPeer: new Peer( this.socket.id, {host: "meetapp-peerjs-server.herokuapp.com", port: window.location.protocol === 'https:' ? 443 : 9000, secure: true, debug: 3, 
           config: {'iceServers': [
               { 'urls': 'stun:stun.l.google.com:19302' },
               { 'urls': 'turn:numb.viagenie.ca:3478', credential: 'muazkh', username:'webrtc@live.com' },
@@ -46,9 +54,11 @@ class SimpleRoom extends Component {
               { 'urls': 'turn:192.158.29.39:3478?transport=tcp', credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=', username:'28224511:1379330808' },
               { 'urls': "turn:13.250.13.83:3478?transport=udp","username": "YzYNCouZM1mhqhmseWk6","credential": "YzYNCouZM1mhqhmseWk6"}
             ]
-          }})});
-      this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
-      this.getAllUsers(roomId);
+          }})});  
+          this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
+          this.getAllUsers(roomId);
+          console.log("my peer",this.state.MyPeer);
+        }
     });
     
     this.getMyStream();
