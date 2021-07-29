@@ -58,6 +58,7 @@ class Room extends Component {
           }})});  
           this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
           this.getAllUsers(roomId);
+          this.AcceptConnection();
           console.log("my peer",this.state.MyPeer);
         }
     });

@@ -57,6 +57,7 @@ class SimpleRoom extends Component {
           }})});  
           this.socket.emit("join-room", { roomId: roomId, userName: this.MyName, userId: this.socket.id} ); 
           this.getAllUsers(roomId);
+          this.AcceptConnection();
           console.log("my peer",this.state.MyPeer);
         }
     });
@@ -139,7 +140,9 @@ class SimpleRoom extends Component {
   MakeConnection = (id) => {
     if (this.state.MyPeer!==null){
       var call = this.state.MyPeer.call(id, this.state.MyStream, {metadata: { "type" : "camera"}});
+      console.log("made conn, call -", call)
       call.on("stream", (stream) => {
+        console.log("received stream in make conn");
         if (!this.state.Streams.includes(stream.id)) {
           this.setState({ Streams: [...this.state.Streams, stream.id]})
           this.addMemberVideo(stream, call.peer);
@@ -150,8 +153,11 @@ class SimpleRoom extends Component {
   };
 
   AcceptConnection = () => {
+    console.log("accept conn")
     if (this.state.MyPeer!==null) {
+      console.log("peer set");
       this.state.MyPeer.on("call", (call) => {  
+        console.log("received call in accept conn")
         if (call.metadata.type==="camera") {
           call.answer(this.state.MyStream);
           call.on("stream", (stream) => {
